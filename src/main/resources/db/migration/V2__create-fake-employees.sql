@@ -3,7 +3,10 @@ START TRANSACTION;
 INSERT INTO employees (username, "password", salary)
 	SELECT
         concat('username_',i),
-        UPPER(md5(concat('secret',i,'!'))),
+        crypt(
+            concat('secret',i),
+            gen_salt('bf')
+            ),
         i * 100
     FROM generate_series(1, 100) as i;
 

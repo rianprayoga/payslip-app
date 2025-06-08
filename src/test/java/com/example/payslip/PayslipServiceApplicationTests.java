@@ -1,28 +1,21 @@
 package com.example.payslip;
 
-import jakarta.xml.bind.DatatypeConverter;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 class PayslipServiceApplicationTests {
 
 	@Test
 	void contextLoads() throws NoSuchAlgorithmException {
-		String a = "what";
-		String aHash = "4A2028ECEAC5E1F4D252EA13C71ECEC6";
-		String b = "WHAT";
 
-		MessageDigest md5 = MessageDigest.getInstance("MD5");
-		md5.update(a.getBytes());
+		PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-		String s = DatatypeConverter.printHexBinary(md5.digest());
-		assert s.equals(aHash);
-
-		md5.update(b.getBytes());
-		s = DatatypeConverter.printHexBinary(md5.digest());
-		assert !aHash.equals(s);
+		String hash = "$2a$06$SPrtJuddYQa5wuB1SMnWfe7So6c7cQUpUbAXEQfEvAGBju.FVJmEu";
+		boolean matches = encoder.matches("secret1", hash);
+		System.out.println(matches);
 
 
 	}

@@ -1,5 +1,7 @@
 START TRANSACTION;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE employees(
     id  UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     username VARCHAR(100) NOT NULL,

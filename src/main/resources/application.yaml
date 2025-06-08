@@ -14,3 +14,9 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none
+  mvc:
+    log-request-details: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
