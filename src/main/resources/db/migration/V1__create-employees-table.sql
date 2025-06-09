@@ -7,7 +7,7 @@ CREATE TABLE employees(
     username VARCHAR(100) NOT NULL,
     password TEXT NOT NULL,
     salary BIGINT NOT NULL,
-    CONSTRAINT salary_range CHECK (salary >= 0)
+    CONSTRAINT salary_range CHECK (salary > 0)
 );
 
 CREATE UNIQUE INDEX unique_employees_username ON employees (username);

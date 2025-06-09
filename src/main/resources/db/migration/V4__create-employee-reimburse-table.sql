@@ -1,12 +1,12 @@
 START TRANSACTION;
 
-CREATE TABLE employee_attendances(
+CREATE TABLE employee_reimbursements(
     id  UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     employee_id UUID NOT NULL references employees(id),
-    attendance_date bigint NOT NULL ,
-    check_in bigint ,
-    check_out bigint ,
-    created_at  bigint  NOT NULL ,
+    amount bigint NOT NULL ,
+    CONSTRAINT amount_range CHECK (amount > 0),
+    description VARCHAR(100) NOT NULL,
+    created_at   bigint  NOT NULL ,
     updated_at  bigint  NOT NULL,
     CONSTRAINT fk_employee_id FOREIGN KEY (employee_id) REFERENCES employees
 );

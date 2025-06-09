@@ -45,8 +45,8 @@ public class EmployeeAttendanceService {
 
             long currentTimeMillis = System.currentTimeMillis();
             attendance.setCheckIn(currentTimeMillis);
-            attendance.setCreatedOn(currentTimeMillis);
-            attendance.setModifiedOn(currentTimeMillis);
+            attendance.setCreatedAt(currentTimeMillis);
+            attendance.setUpdatedAt(currentTimeMillis);
             attendanceRepository.save(attendance);
 
             return PostAttendanceResponse.checkInResponse("Check in successful", currentTimeMillis);
@@ -61,7 +61,7 @@ public class EmployeeAttendanceService {
 
         long currentTime = System.currentTimeMillis();
         attendance.setCheckOut(currentTime);
-        attendance.setModifiedOn(currentTime);
+        attendance.setUpdatedAt(currentTime);
         attendanceRepository.save(attendance);
 
         return PostAttendanceResponse.checkOutResponse("Check out successful", currentTime);

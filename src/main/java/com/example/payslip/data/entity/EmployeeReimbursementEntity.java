@@ -7,13 +7,14 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.UUID;
 
 @Entity
-@Table(name = "employee_attendances")
+@Table(name = "employee_reimbursements")
 @Getter
 @Setter
-public class EmployeeAttendanceEntity {
+public class EmployeeReimbursementEntity {
 
     @Id
     private UUID id;
@@ -21,14 +22,11 @@ public class EmployeeAttendanceEntity {
     @Column(name = "employee_id")
     private UUID employeeId;
 
-    @Column(name = "attendance_date")
-    private Long attendanceDate;
+    @Column(name = "amount")
+    private BigInteger amount;
 
-    @Column(name = "check_in")
-    private Long checkIn;
-
-    @Column(name = "check_out")
-    private Long checkOut;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "created_at")
     private Long createdAt;
