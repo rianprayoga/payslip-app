@@ -1,8 +1,11 @@
 package com.example.payslip.controller.attendances;
 
 import com.example.payslip.config.AuthService;
+import com.example.payslip.config.User;
 import com.example.payslip.config.filter.authentication.EmployeeAuthentication;
 import com.example.payslip.controller.attendances.dto.PostAttendanceRequest;
+import com.example.payslip.controller.attendances.dto.PostAttendanceResponse;
+import com.example.payslip.service.EmployeeAttendanceService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +25,16 @@ import static com.example.payslip.controller.UrlConstant.V1;
 public class AttendancesController {
 
     private final AuthService authService;
+    private final EmployeeAttendanceService employeeAttendanceService;
 
     @PostMapping("/client/attendances")
-    public ResponseEntity<String> postAttendance(@Valid @RequestBody PostAttendanceRequest request){
-        EmployeeAuthentication authentication = authService.getAuthentication(EmployeeAuthentication.class);
+    public ResponseEntity<PostAttendanceResponse> postAttendance(@Valid @RequestBody PostAttendanceRequest request){
 
-        return ResponseEntity.ok("WHAT");
+        EmployeeAuthentication authentication = authService.getAuthentication(EmployeeAuthentication.class);
+        User user = authentication.getUser();
+
+        PostAttendanceResponse response = employeeAttendanceService.postAttendance(user, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/admin/what")

@@ -3,6 +3,8 @@ package com.example.payslip.controller.attendances.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
+import java.math.BigInteger;
+
 @Getter
 public class PostAttendanceRequest {
 

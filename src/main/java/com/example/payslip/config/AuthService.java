@@ -43,7 +43,8 @@ public class AuthService {
         }
 
         User credential = new User(employeeEntity.getId(), employeeEntity.getUsername());
-        SecurityContextHolder.getContext().setAuthentication(new EmployeeAuthentication(null, credential, List.of()));
+        SecurityContextHolder.getContext()
+                .setAuthentication(new EmployeeAuthentication(credential, null, null, List.of()));
     }
 
 
