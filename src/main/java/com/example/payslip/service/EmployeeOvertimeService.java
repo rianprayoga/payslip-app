@@ -26,7 +26,7 @@ public class EmployeeOvertimeService {
 
     public PostOvertimeResponse postOvertime(User user, PostOvertimeRequest request) {
 
-        Long normalizedSubmissionDate = dateHelper.toMiddleNight(request.getSubmissionDate());
+        Long normalizedSubmissionDate = dateHelper.toEarlyNight(request.getSubmissionDate());
 
         Optional<EmployeeAttendanceEntity> attendance =
                 attendanceRepository.findByEmployeeIdAndAttendanceDate(user.getId(), normalizedSubmissionDate);
@@ -38,7 +38,7 @@ public class EmployeeOvertimeService {
             throw new BadRequestException("Can't propose overtime, you haven't check-out today.");
         }
 
-        Long normalizedOvertimeDate = dateHelper.toMiddleNight(request.getSubmissionDate());
+        Long normalizedOvertimeDate = dateHelper.toEarlyNight(request.getSubmissionDate());
         List<EmployeeOvertimeEntity> overtime =
                 overtimeRepository.findByEmployeeIdAndOvertimeDate(user.getId(), normalizedOvertimeDate);
 

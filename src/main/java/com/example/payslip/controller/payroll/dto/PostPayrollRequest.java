@@ -4,11 +4,13 @@ package com.example.payslip.controller.payroll.dto;
 import com.example.payslip.errors.http.BadRequestException;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
 public class PostPayrollRequest {
     @NotEmpty(message = "Value of name can't be null.")
+    @Size(max = 100)
     private String name;
     @Positive(message = "Value of startDate must be bigger than 0.")
     private Long startDate;

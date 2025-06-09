@@ -5,9 +5,11 @@ import com.example.payslip.config.User;
 import com.example.payslip.config.filter.authentication.AdminAuthentication;
 import com.example.payslip.config.filter.authentication.EmployeeAuthentication;
 import com.example.payslip.controller.payroll.dto.PostPayrollRequest;
+import com.example.payslip.controller.payroll.dto.PostPayrollResponse;
 import com.example.payslip.controller.reimbusement.dto.PostReimburseRequest;
 import com.example.payslip.controller.reimbusement.dto.PostReimburseResponse;
 import com.example.payslip.service.EmployeeReimburseService;
+import com.example.payslip.service.PayrollService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +28,16 @@ import static com.example.payslip.controller.UrlConstant.V1;
 public class PayrollController {
 
     private final AuthService authService;
+    private final PayrollService payrollService;
 
     @PostMapping("/admin/payrolls")
-    public ResponseEntity<String> postReimbursement(@Valid @RequestBody PostPayrollRequest request) {
+    public ResponseEntity<PostPayrollResponse> postReimbursement(@Valid @RequestBody PostPayrollRequest request) {
 
-        AdminAuthentication authentication = authService.getAuthentication(AdminAuthentication.class);
-        User user = authentication.getUser();
+        authService.getAuthentication(AdminAuthentication.class);
 
-        return ResponseEntity.ok("aaaaa");
+        PostPayrollResponse response = payrollService.postPayroll(request);
+
+        return ResponseEntity.ok(response);
     }
 
 }

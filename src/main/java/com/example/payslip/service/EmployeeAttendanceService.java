@@ -41,7 +41,7 @@ public class EmployeeAttendanceService {
             attendance.setId(UUID.randomUUID());
             attendance.setEmployeeId(user.getId());
 
-            long epochAtZero = dateHelper.toMiddleNight(request.getDate());
+            long epochAtZero = dateHelper.toEarlyNight(request.getDate());
             attendance.setAttendanceDate(epochAtZero);
 
             long currentTimeMillis = System.currentTimeMillis();
@@ -69,7 +69,7 @@ public class EmployeeAttendanceService {
     }
 
     private Optional<EmployeeAttendanceEntity> getAttendance(User user, PostAttendanceRequest request) {
-        long startOfToday = dateHelper.toMiddleNight(request.getDate());
+        long startOfToday = dateHelper.toEarlyNight(request.getDate());
         return attendanceRepository.findByEmployeeIdAndAttendanceDate(user.getId(), startOfToday);
     }
 

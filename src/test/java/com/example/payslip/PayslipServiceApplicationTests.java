@@ -1,5 +1,6 @@
 package com.example.payslip;
 
+import com.example.payslip.utilities.DateHelper;
 import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;
@@ -30,7 +31,9 @@ class PayslipServiceApplicationTests {
 		int i = instance.get(Calendar.DAY_OF_WEEK);
 		System.out.println(i);
 
-
+		DateHelper helper = new DateHelper();
+		Long lateNight = helper.toLateNight(todayAtCurrent);
+        System.out.println(lateNight);
 	}
 
 }
