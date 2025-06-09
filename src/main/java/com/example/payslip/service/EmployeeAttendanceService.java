@@ -7,6 +7,7 @@ import com.example.payslip.controller.attendances.dto.PostAttendanceResponse;
 import com.example.payslip.data.entity.EmployeeAttendanceEntity;
 import com.example.payslip.data.repository.AttendanceRepository;
 import com.example.payslip.errors.http.BadRequestException;
+import com.example.payslip.utilities.DateHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class EmployeeAttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final DateHelper dateHelper;
 
     public PostAttendanceResponse postAttendance(User user, PostAttendanceRequest request){
 
@@ -39,8 +41,7 @@ public class EmployeeAttendanceService {
             attendance.setId(UUID.randomUUID());
             attendance.setEmployeeId(user.getId());
 
-            Instant instantToday = Instant.ofEpochMilli(request.getDate());
-            long epochAtZero = instantToday.truncatedTo(ChronoUnit.DAYS).toEpochMilli();
+            long epochAtZero = dateHelper.toMiddleNight(request.getDate());
             attendance.setAttendanceDate(epochAtZero);
 
             long currentTimeMillis = System.currentTimeMillis();
@@ -68,9 +69,7 @@ public class EmployeeAttendanceService {
     }
 
     private Optional<EmployeeAttendanceEntity> getAttendance(User user, PostAttendanceRequest request) {
-        Instant instantToday = Instant.ofEpochMilli(request.getDate());
-        long startOfToday = instantToday.truncatedTo(ChronoUnit.DAYS).toEpochMilli();
-
+        long startOfToday = dateHelper.toMiddleNight(request.getDate());
         return attendanceRepository.findByEmployeeIdAndAttendanceDate(user.getId(), startOfToday);
     }
 
