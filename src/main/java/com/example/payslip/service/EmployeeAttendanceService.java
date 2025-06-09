@@ -78,7 +78,7 @@ public class EmployeeAttendanceService {
         instance.setTimeInMillis(date);
         int i = instance.get(Calendar.DAY_OF_WEEK);
 
-        if (i == 1 || i == 7){
+        if (i == Calendar.SUNDAY || i == Calendar.SATURDAY) {
             throw new BadRequestException("User can't add attendance on saturday and sunday.");
         }
     }
