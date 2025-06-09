@@ -25,10 +25,12 @@ class PayslipServiceApplicationTests {
 		System.out.printf("midnight from todayAtZero  %s%n", startOfTodayZero);
 		System.out.printf("midnight from todayAtZero  %s%n", todayAtZero + millisInADay - 1000);
 
+		Calendar instance = Calendar.getInstance();
+		instance.setTimeInMillis(1749340800000L);
+		int i = instance.get(Calendar.DAY_OF_WEEK);
+		System.out.println(i);
 
-//		System.out.println(calendar.getTimeInMillis());
-//		int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-//		System.out.println(dayOfWeek);
+
 	}
 
 }

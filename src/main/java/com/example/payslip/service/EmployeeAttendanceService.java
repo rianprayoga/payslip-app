@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +31,9 @@ public class EmployeeAttendanceService {
             if (existingAttendance.isPresent()){
                 throw new BadRequestException("User already check in.");
             }
+
+            validateNotWeekEnd(request.getDate());
+            validateDateIsToday(request.getDate());
 
             EmployeeAttendanceEntity attendance = new EmployeeAttendanceEntity();
             attendance.setId(UUID.randomUUID());
@@ -68,6 +72,28 @@ public class EmployeeAttendanceService {
         long startOfToday = instantToday.truncatedTo(ChronoUnit.DAYS).toEpochMilli();
 
         return attendanceRepository.findByEmployeeIdAndAttendanceDate(user.getId(), startOfToday);
+    }
+
+    private void validateNotWeekEnd(Long date){
+        Calendar instance = Calendar.getInstance();
+        instance.setTimeInMillis(date);
+        int i = instance.get(Calendar.DAY_OF_WEEK);
+
+        if (i == 1 || i == 7){
+            throw new BadRequestException("User can't add attendance on saturday and sunday.");
+        }
+    }
+
+    private void validateDateIsToday(Long date){
+        long millisInADay = 86_400_000L;
+
+        Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());
+        long todayLastNight = instant.truncatedTo(ChronoUnit.DAYS).toEpochMilli();
+        long todayNight = todayLastNight + millisInADay - 1000;
+
+        if (todayLastNight <= date && todayNight > date) return;
+        throw new BadRequestException(
+                "User can't check in neither on the past or future. Check-in must be on the same day as today.");
     }
 
 }
