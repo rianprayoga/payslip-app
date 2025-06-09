@@ -6,6 +6,7 @@ CREATE TABLE employee_reimbursements(
     amount bigint NOT NULL ,
     CONSTRAINT amount_range CHECK (amount > 0),
     description VARCHAR(100) NOT NULL,
+    submission_date   bigint  NOT NULL ,
     created_at   bigint  NOT NULL ,
     updated_at  bigint  NOT NULL,
     CONSTRAINT fk_employee_id FOREIGN KEY (employee_id) REFERENCES employees

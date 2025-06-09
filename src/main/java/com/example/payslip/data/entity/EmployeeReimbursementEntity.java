@@ -28,6 +28,9 @@ public class EmployeeReimbursementEntity {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "submission_date")
+    private Long submissionDate;
+
     @Column(name = "created_at")
     private Long createdAt;
 
