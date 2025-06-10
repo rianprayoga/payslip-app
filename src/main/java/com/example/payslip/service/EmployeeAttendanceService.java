@@ -6,6 +6,7 @@ import com.example.payslip.controller.attendances.dto.PostAttendanceRequest;
 import com.example.payslip.controller.attendances.dto.PostAttendanceResponse;
 import com.example.payslip.data.entity.EmployeeAttendanceEntity;
 import com.example.payslip.data.repository.AttendanceRepository;
+import com.example.payslip.data.repository.PayrollRepository;
 import com.example.payslip.errors.http.BadRequestException;
 import com.example.payslip.utilities.DateHelper;
 import lombok.AllArgsConstructor;
@@ -21,10 +22,16 @@ import java.util.UUID;
 @AllArgsConstructor
 public class EmployeeAttendanceService {
 
+    private final PayrollRepository payrollRepository;
     private final AttendanceRepository attendanceRepository;
     private final DateHelper dateHelper;
 
     public PostAttendanceResponse postAttendance(User user, PostAttendanceRequest request){
+
+        Optional<UUID> payroll = payrollRepository.findCurrentPayrollBy(System.currentTimeMillis());
+        if (payroll.isPresent()){
+            throw new BadRequestException("Current payroll already locked.");
+        }
 
         Optional<EmployeeAttendanceEntity> existingAttendance = getAttendance(user, request);
 

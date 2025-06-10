@@ -7,6 +7,7 @@ import com.example.payslip.data.entity.EmployeeAttendanceEntity;
 import com.example.payslip.data.entity.EmployeeOvertimeEntity;
 import com.example.payslip.data.repository.AttendanceRepository;
 import com.example.payslip.data.repository.OvertimeRepository;
+import com.example.payslip.data.repository.PayrollRepository;
 import com.example.payslip.errors.http.BadRequestException;
 import com.example.payslip.utilities.DateHelper;
 import lombok.AllArgsConstructor;
@@ -23,9 +24,15 @@ public class EmployeeOvertimeService {
     public static final int OVERTIME_LIMIT_IN_A_DAY = 3;
     private final AttendanceRepository attendanceRepository;
     private final OvertimeRepository overtimeRepository;
+    private final PayrollRepository payrollRepository;
     private final DateHelper dateHelper;
 
     public PostOvertimeResponse postOvertime(User user, PostOvertimeRequest request) {
+
+        Optional<UUID> payroll = payrollRepository.findCurrentPayrollBy(request.getOvertimeDate());
+        if (payroll.isPresent()){
+            throw new BadRequestException("Current payroll already locked.");
+        }
 
         Long submissionDate = dateHelper.toEarlyNight(System.currentTimeMillis());
 
