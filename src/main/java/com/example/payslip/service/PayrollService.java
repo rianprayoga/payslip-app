@@ -1,5 +1,7 @@
 package com.example.payslip.service;
 
+import com.example.payslip.config.User;
+import com.example.payslip.controller.payroll.dto.GetPayslipsResponse;
 import com.example.payslip.controller.payroll.dto.PostPayrollRequest;
 import com.example.payslip.controller.payroll.dto.PostPayrollResponse;
 import com.example.payslip.data.domain.Attendance;
@@ -22,6 +24,7 @@ import com.example.payslip.utilities.DateHelper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -45,6 +48,23 @@ public class PayrollService {
     private final ReimburseRepository reimburseRepository;
     private final OvertimeRepository overtimeRepository;
     private final DateHelper dateHelper;
+
+    public DetailSalary getPayslip(User user, String payrollId){
+        Optional<PayslipEntity> payslip = payslipRepository.findBy(user.getId(), UUID.fromString(payrollId));
+        PayslipEntity payslipEntity =
+                payslip.orElseThrow(() -> new NotFoundException("Payroll %s not found.".formatted(payrollId)));
+
+        return payslipEntity.getDetailSalary();
+    }
+
+    public GetPayslipsResponse getPayslips(String payrollId){
+        List<PayslipEntity> payslipEntities = payslipRepository.findBy(UUID.fromString(payrollId));
+        if (CollectionUtils.isEmpty(payslipEntities)){
+            return new GetPayslipsResponse(emptyList());
+        }
+        List<DetailSalary> salaries = payslipEntities.stream().map(PayslipEntity::getDetailSalary).toList();
+        return new GetPayslipsResponse(salaries);
+    }
 
     public PostPayrollResponse postPayroll(PostPayrollRequest request) {
 
