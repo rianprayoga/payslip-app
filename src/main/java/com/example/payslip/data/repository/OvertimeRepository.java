@@ -29,7 +29,7 @@ public interface OvertimeRepository extends JpaRepository<EmployeeOvertimeEntity
         eo.id ,
         eo.employee_id employeeId,
         eo.duration ,
-        eo.duration * (e.salary/160) as salary
+        eo.duration * 2 * (e.salary/160) as salary
     from employee_overtimes eo left join employees e
     on eo.employee_id = e.id
             where
