@@ -1,0 +1,212 @@
+openapi: 3.0.4
+info:
+  title: Swagger Payroll
+  description: |-
+    This documentation for client.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost/v1
+tags:
+  - name: payrolls
+    description: Payrolls of employees
+  - name: overtimes
+    description: Overtimes of employees
+  - name: attendances
+    description: Attendances of employees
+  - name: reimbursements
+    description: Reimbursements of employees
+paths:
+  /client/attendances:
+    post:
+      tags:
+        - attendances
+      summary: Performing check-in or check-out for employees.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAttendanceRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostAttendanceResponse'
+  /client/reimbursements:
+    post:
+      tags:
+        - reimbursements
+      summary: Adding reimbursement of employee.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostReimburseRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostReimburseResponse'
+  /client/overtimes:
+    post:
+      tags:
+        - overtimes
+      summary: Adding overtime of employee.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostOvertimeRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostOvertimeResponse'
+  /client/payrolls/{payrollId}:
+    get:
+      tags:
+        - payrolls
+      summary: Get payslip pet by payrollId.
+      parameters:
+        - name: payrollId
+          in: path
+          description: Id of payroll period
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayslipResponse'
+
+components:
+  schemas:
+    PostAttendanceRequest:
+      type: object
+      required:
+        - date
+        - type
+      properties:
+        date:
+          type: integer
+          example: 1749686400000
+        type:
+          type: string
+          enum:
+            - CHECK_IN
+            - CHECK_OUT
+    PostAttendanceResponse:
+      type: object
+      properties:
+        checkOutTime:
+          type: integer
+          example: 1749686400000
+        checkInTime:
+          type: integer
+          example: 1749686400000
+        type:
+          type: string
+          enum:
+            - CHECK_IN
+            - CHECK_OUT
+        message:
+          type: string
+    PostReimburseRequest:
+      type: object
+      required:
+        - amount
+        - description
+      properties:
+        amount:
+          type: integer
+          example: 150
+        description:
+          type: string
+          example: desc of reimbursement
+    PostReimburseResponse:
+      type: object
+      properties:
+        reimbursementId:
+          type: string
+        message:
+          type: string
+    PostOvertimeRequest:
+      type: object
+      required:
+        - duration
+        - overtimeDate
+      properties:
+        duration:
+          type: integer
+          example: 3
+        overtimeDate:
+          type: integer
+          example: 1749686400000
+    PostOvertimeResponse:
+      type: object
+      properties:
+        overtimeId:
+          type: string
+        message:
+          type: string
+    GetPayslipResponse:
+      type: object
+      properties:
+        employeeId:
+          type: string
+        takeHomePay:
+          type: number
+        attendanceSalary:
+          $ref: '#/components/schemas/AttendanceSalary'
+        overtimeSalaries:
+          $ref: '#/components/schemas/OvertimeSalaries'
+        reimbursements:
+          $ref: '#/components/schemas/ReimburseSalaries'
+    AttendanceSalary:
+      type: object
+      properties:
+        salary:
+          type: number
+        attendanceNumber:
+          type: integer
+    OvertimeSalaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/OvertimeSalary'
+    OvertimeSalary:
+      type: object
+      properties:
+        overtimeId:
+          type: string
+        salary:
+          type: number
+        duration:
+          type: integer
+    ReimburseSalaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReimburseSalary'
+    ReimburseSalary:
+      type: object
+      properties:
+        reimbursementId:
+          type: string
+        salary:
+          type: number
+
+  securitySchemes:
+    basic_auth:
+      type: http
+      scheme: basic
+
+security:
+  - basic_auth: []

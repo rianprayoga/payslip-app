@@ -37,11 +37,4 @@ public class AttendancesController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/admin/what")
-    public ResponseEntity<String> testAdmin(){
-        return ResponseEntity.ok("WHAT");
-    }
-
-
-
 }
