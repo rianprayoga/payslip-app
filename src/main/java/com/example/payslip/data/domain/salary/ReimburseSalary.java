@@ -1,13 +1,14 @@
 package com.example.payslip.data.domain.salary;
 
 import com.example.payslip.data.domain.Reimbursement;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor
 public class ReimburseSalary {
     private UUID employeeId;
     private UUID reimbursementId;

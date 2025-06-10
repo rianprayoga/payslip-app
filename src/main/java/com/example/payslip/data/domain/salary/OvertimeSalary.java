@@ -2,11 +2,13 @@ package com.example.payslip.data.domain.salary;
 
 import com.example.payslip.data.domain.Overtime;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor
 public class OvertimeSalary {
     private UUID employeeId;
     private UUID overtimeId;

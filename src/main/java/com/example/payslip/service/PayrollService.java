@@ -3,23 +3,23 @@ package com.example.payslip.service;
 import com.example.payslip.controller.payroll.dto.PostPayrollRequest;
 import com.example.payslip.controller.payroll.dto.PostPayrollResponse;
 import com.example.payslip.data.domain.Attendance;
-import com.example.payslip.data.domain.Employee;
 import com.example.payslip.data.domain.Overtime;
 import com.example.payslip.data.domain.Reimbursement;
 import com.example.payslip.data.domain.salary.AttendanceSalary;
 import com.example.payslip.data.domain.salary.DetailSalary;
 import com.example.payslip.data.domain.salary.OvertimeSalary;
 import com.example.payslip.data.domain.salary.ReimburseSalary;
-import com.example.payslip.data.entity.EmployeeEntity;
 import com.example.payslip.data.entity.PayrollEntity;
+import com.example.payslip.data.entity.PayslipEntity;
 import com.example.payslip.data.repository.AttendanceRepository;
-import com.example.payslip.data.repository.EmployeeRepository;
 import com.example.payslip.data.repository.OvertimeRepository;
 import com.example.payslip.data.repository.PayrollRepository;
+import com.example.payslip.data.repository.PayslipRepository;
 import com.example.payslip.data.repository.ReimburseRepository;
 import com.example.payslip.errors.http.BadRequestException;
 import com.example.payslip.errors.http.NotFoundException;
 import com.example.payslip.utilities.DateHelper;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,13 +39,14 @@ import static java.util.Collections.emptyList;
 @AllArgsConstructor
 public class PayrollService {
 
+    private final PayslipRepository payslipRepository;
     private final PayrollRepository payrollRepository;
     private final AttendanceRepository attendanceRepository;
     private final ReimburseRepository reimburseRepository;
     private final OvertimeRepository overtimeRepository;
     private final DateHelper dateHelper;
 
-    public PostPayrollResponse postPayroll(PostPayrollRequest request){
+    public PostPayrollResponse postPayroll(PostPayrollRequest request) {
 
         Long start = dateHelper.toEarlyNight(request.getStartDate());
         Long end = dateHelper.toLateNight(request.getEndDate());
@@ -69,13 +70,14 @@ public class PayrollService {
         return new PostPayrollResponse(entity.getId().toString(), "Payroll added.");
     }
 
-    public void payments(String payrollId){
+    @Transactional
+    public void payments(String payrollId) {
 
         Optional<PayrollEntity> payroll = payrollRepository.findById(UUID.fromString(payrollId));
         PayrollEntity payrollEntity =
                 payroll.orElseThrow(() -> new NotFoundException("Payroll %s not found.".formatted(payroll)));
 
-        if (payrollEntity.isLocked()){
+        if (payrollEntity.isLocked()) {
             throw new BadRequestException("Payroll %s already locked.");
         }
 
@@ -103,33 +105,53 @@ public class PayrollService {
         employeeIds.addAll(reimbursementByEmployee.keySet());
         employeeIds.addAll(overtimeByEmployee.keySet());
 
-        List<DetailSalary> salaries = employeeIds.stream().map(uuid -> {
-            BigDecimal total = BigDecimal.ZERO;
+        List<DetailSalary> salaries = employeeIds.stream()
+                .map(uuid -> {
+                    BigDecimal total = BigDecimal.ZERO;
 
-            BigDecimal reimburse = reimbursementByEmployee.getOrDefault(uuid, emptyList())
-                    .stream()
-                    .map(ReimburseSalary::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            total = total.add(reimburse);
+                    BigDecimal reimburse = reimbursementByEmployee.getOrDefault(uuid, emptyList()).stream()
+                            .map(ReimburseSalary::getAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    total = total.add(reimburse);
 
-            BigDecimal overtime = overtimeByEmployee.getOrDefault(uuid, emptyList())
-                    .stream()
-                    .map(OvertimeSalary::getSalary).reduce(BigDecimal.ZERO, BigDecimal::add);
-            total = total.add(overtime);
+                    BigDecimal overtime = overtimeByEmployee.getOrDefault(uuid, emptyList()).stream()
+                            .map(OvertimeSalary::getSalary)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    total = total.add(overtime);
 
-            AttendanceSalary attendance = attendanceByEmployee.getOrDefault(uuid, null);
-            if (attendance != null) {
-                total = total.add(attendance.getSalary());
-            }
+                    AttendanceSalary attendance = attendanceByEmployee.getOrDefault(uuid, null);
+                    if (attendance != null) {
+                        total = total.add(attendance.getSalary());
+                    }
 
-            DetailSalary detailSalary = new DetailSalary();
-            detailSalary.setEmployeeId(uuid);
-            detailSalary.setAttendanceSalary(attendanceByEmployee.get(uuid));
-            detailSalary.setReimbursements(reimbursementByEmployee.get(uuid));
-            detailSalary.setOvertimeSalaries(overtimeByEmployee.get(uuid));
-            detailSalary.setTakeHomePay(total);
-            return detailSalary;
-        }).toList();
+                    DetailSalary detailSalary = new DetailSalary();
+                    detailSalary.setEmployeeId(uuid);
+                    detailSalary.setAttendanceSalary(attendanceByEmployee.get(uuid));
+                    detailSalary.setReimbursements(reimbursementByEmployee.get(uuid));
+                    detailSalary.setOvertimeSalaries(overtimeByEmployee.get(uuid));
+                    detailSalary.setTakeHomePay(total);
+                    return detailSalary;
+                })
+                .toList();
 
+        List<PayslipEntity> payslipEntities = salaries.stream()
+                .map(detailSalary -> {
+                    PayslipEntity payslipEntity = new PayslipEntity();
+                    payslipEntity.setId(UUID.randomUUID());
+                    payslipEntity.setPayrollId(UUID.fromString(payrollId));
+                    payslipEntity.setTakeHomePay(detailSalary.getTakeHomePay());
+                    payslipEntity.setEmployeeId(detailSalary.getEmployeeId());
+                    payslipEntity.setDetailSalary(detailSalary);
+                    payslipEntity.setCreatedAt(System.currentTimeMillis());
+                    payslipEntity.setUpdatedAt(System.currentTimeMillis());
+                    return payslipEntity;
+                })
+                .toList();
+
+        payslipRepository.saveAll(payslipEntities);
+
+        payrollEntity.setLocked(true);
+        payrollEntity.setUpdatedAt(System.currentTimeMillis());
+        payrollRepository.save(payrollEntity);
     }
-
 }
