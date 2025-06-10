@@ -20,16 +20,17 @@ import java.util.UUID;
 @AllArgsConstructor
 public class EmployeeOvertimeService {
 
+    public static final int OVERTIME_LIMIT_IN_A_DAY = 3;
     private final AttendanceRepository attendanceRepository;
     private final OvertimeRepository overtimeRepository;
     private final DateHelper dateHelper;
 
     public PostOvertimeResponse postOvertime(User user, PostOvertimeRequest request) {
 
-        Long normalizedSubmissionDate = dateHelper.toEarlyNight(request.getSubmissionDate());
+        Long submissionDate = dateHelper.toEarlyNight(System.currentTimeMillis());
 
         Optional<EmployeeAttendanceEntity> attendance =
-                attendanceRepository.findByEmployeeIdAndAttendanceDate(user.getId(), normalizedSubmissionDate);
+                attendanceRepository.findByEmployeeIdAndAttendanceDate(user.getId(), submissionDate);
 
         EmployeeAttendanceEntity attendanceEntity = attendance.orElseThrow(
                 () -> new BadRequestException("Can't propose overtime, you haven't finished today's time."));
@@ -38,22 +39,22 @@ public class EmployeeOvertimeService {
             throw new BadRequestException("Can't propose overtime, you haven't check-out today.");
         }
 
-        Long normalizedOvertimeDate = dateHelper.toEarlyNight(request.getSubmissionDate());
+        Long overtimeDate = dateHelper.toEarlyNight(request.getOvertimeDate());
         List<EmployeeOvertimeEntity> overtime =
-                overtimeRepository.findByEmployeeIdAndOvertimeDate(user.getId(), normalizedOvertimeDate);
+                overtimeRepository.findByEmployeeIdAndOvertimeDate(user.getId(), overtimeDate);
 
         Integer durationDesignatedDate =
                 overtime.stream().map(EmployeeOvertimeEntity::getDuration).reduce(0, Integer::sum);
-        if (durationDesignatedDate == 3){
+        if (durationDesignatedDate == OVERTIME_LIMIT_IN_A_DAY){
             throw new BadRequestException("Can't propose overtime, overtime duration already reached limit.");
         }
 
         EmployeeOvertimeEntity overtimeEntity = new EmployeeOvertimeEntity();
         overtimeEntity.setId(UUID.randomUUID());
         overtimeEntity.setEmployeeId(user.getId());
-        overtimeEntity.setSubmissionDate(normalizedSubmissionDate);
+        overtimeEntity.setSubmissionDate(submissionDate);
         overtimeEntity.setDuration(request.getDuration());
-        overtimeEntity.setOvertimeDate(normalizedOvertimeDate);
+        overtimeEntity.setOvertimeDate(overtimeDate);
 
         long current = System.currentTimeMillis();
         overtimeEntity.setCreatedAt(current);

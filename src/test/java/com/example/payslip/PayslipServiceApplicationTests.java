@@ -1,39 +1,38 @@
 package com.example.payslip;
 
-import com.example.payslip.utilities.DateHelper;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 class PayslipServiceApplicationTests {
 
 	@Test
 	void contextLoads() throws NoSuchAlgorithmException {
 
-		long millisInADay = 86_400_000L;
-		long todayAtZero = 1749427200000L;
-		long todayAtCurrent = System.currentTimeMillis();
 
-		Instant instantToday = Instant.ofEpochMilli(todayAtCurrent);
-		long startOfToday = instantToday.truncatedTo(ChronoUnit.DAYS).toEpochMilli();
-        System.out.printf("midnight from todayAtCurrent  %s%n", startOfToday);
+		double a = 1234;
+		BigDecimal salary = BigDecimal.valueOf(a);
+		int b = 160;
 
-		Instant instantTodayZero = Instant.ofEpochMilli(todayAtZero);
-		long startOfTodayZero = instantTodayZero.truncatedTo(ChronoUnit.DAYS).toEpochMilli();
-		System.out.printf("midnight from todayAtZero  %s%n", startOfTodayZero);
-		System.out.printf("midnight from todayAtZero  %s%n", todayAtZero + millisInADay - 1000);
+		System.out.println(salary.divide(BigDecimal.valueOf(b)));
+		BigDecimal salaryPerHour = salary.divide(BigDecimal.valueOf(b));
+//		int i = 20 * 8 *
+//				salaryPerHour.multiply(BigDecimal.valueOf(160L));
+//		BigDecimal x = salaryPerHour.multiply(BigDecimal.valueOf(160L));
+//		System.out.println(x);
 
-		Calendar instance = Calendar.getInstance();
-		instance.setTimeInMillis(1749340800000L);
-		int i = instance.get(Calendar.DAY_OF_WEEK);
-		System.out.println(i);
-
-		DateHelper helper = new DateHelper();
-		Long lateNight = helper.toLateNight(todayAtCurrent);
-        System.out.println(lateNight);
+		Set<String> asd = new HashSet<>();
+		asd.addAll(List.of("a", "b"));
+		asd.addAll(List.of("b", "c"));
+		asd.addAll(List.of("d", "e"));
+		System.out.println(asd);
 	}
 
 }

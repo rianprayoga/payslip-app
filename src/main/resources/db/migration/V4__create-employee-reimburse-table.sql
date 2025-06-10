@@ -3,7 +3,7 @@ START TRANSACTION;
 CREATE TABLE employee_reimbursements(
     id  UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     employee_id UUID NOT NULL references employees(id),
-    amount bigint NOT NULL ,
+    amount decimal NOT NULL ,
     CONSTRAINT amount_range CHECK (amount > 0),
     description VARCHAR(100) NOT NULL,
     submission_date   bigint  NOT NULL ,

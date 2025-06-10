@@ -16,10 +16,6 @@ public class PostOvertimeRequest {
 
     @Positive(message = "Value of duration must be bigger than 0.")
     @NotNull
-    private long submissionDate;
-
-    @Positive(message = "Value of duration must be bigger than 0.")
-    @NotNull
     private long overtimeDate;
 
 }
