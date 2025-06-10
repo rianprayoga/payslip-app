@@ -1,0 +1,114 @@
+openapi: 3.0.4
+info:
+  title: Swagger Payroll
+  description: |-
+    This documentation for admin.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost/v1
+tags:
+  - name: payrolls
+    description: Payrolls of employees
+
+paths:
+  /admin/payrolls:
+    post:
+      tags:
+        - payrolls
+      summary: Creating payroll period.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPayrollRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostPayrollResponse'
+  /admin/payrolls/{payrollId}/payments:
+    post:
+      tags:
+        - payrolls
+      summary: Run specified payroll.
+      parameters:
+        - name: payrollId
+          in: path
+          description: Id of payroll period
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /admin/payrolls/{payrollId}:
+    get:
+      tags:
+        - payrolls
+      summary: Fetch summary of specified payroll.
+      parameters:
+        - name: payrollId
+          in: path
+          description: Id of payroll period
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollsResponse'
+
+components:
+  schemas:
+    PostPayrollRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        startDate:
+          type: integer
+        endDate:
+          type: integer
+      required:
+        - name
+        - startDate
+        - endDate
+    PostPayrollResponse:
+      type: object
+      properties:
+        payrollId:
+          type: string
+        message:
+          type: string
+    GetPayrollsResponse:
+      type: object
+      properties:
+        total:
+          type: number
+        details:
+          $ref: '#/components/schemas/EmployeeSalaries'
+    EmployeeSalaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmployeeSalary'
+    EmployeeSalary:
+      type: object
+      properties:
+        employeeId:
+          type: string
+        takeHomePay:
+          type: number
+
+  securitySchemes:
+    basic_auth:
+      type: http
+      scheme: basic
+
+security:
+  - basic_auth: []
